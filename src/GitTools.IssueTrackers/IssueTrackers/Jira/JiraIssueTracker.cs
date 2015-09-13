@@ -21,7 +21,7 @@
         {
         }
 
-        public override async Task<IEnumerable<Issue>> GetIssuesAsync(IssueTrackerFilter filter)
+        public override Task<IEnumerable<Issue>> GetIssuesAsync(IssueTrackerFilter filter)
         {
             Log.DebugFormat("Connecting to Jira server '{0}'", IssueTrackerContext.Server);
 
@@ -69,7 +69,7 @@
 
             Log.DebugFormat("Found '{0}' issues using filter '{1}'", issues.Count, filter);
 
-            return issues;
+            return Task.FromResult(issues.AsEnumerable());
         }
 
         private string PrepareFilter(IssueTrackerFilter filter, IEnumerable<IssueStatus> openedStatuses, IEnumerable<IssueStatus> closedStatuses)

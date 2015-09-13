@@ -11,7 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".misc", ".misc", "{2C7C2F12
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitTools.IssueTrackers.Tests", "..\GitTools.IssueTrackers.Tests\GitTools.IssueTrackers.Tests.csproj", "{C92B670C-0D20-40CD-A0B1-C2287D1147AF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitTools.IssueTrackers.Tests", "GitTools.IssueTrackers.Tests\GitTools.IssueTrackers.Tests.csproj", "{C92B670C-0D20-40CD-A0B1-C2287D1147AF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
