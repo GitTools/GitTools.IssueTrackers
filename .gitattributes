@@ -1,0 +1,8 @@
+* text=auto
+
+# Custom for Visual Studio
+*.sln text eol=crlf
+*.csproj
+*.vbproj
+*.fsproj
+*.dbproj
