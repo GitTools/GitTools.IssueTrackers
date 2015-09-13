@@ -7,7 +7,7 @@
         Issue
     }
 
-    public enum IssueTracker
+    public enum IssueTrackerType
     {
         BitBucket,
         GitHub,
@@ -15,7 +15,5 @@
         YouTrack,
 
         //TODO Tfs
-
-        Unknown,
     }
 }

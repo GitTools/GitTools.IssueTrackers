@@ -6,46 +6,42 @@
     using System.Linq;
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
-    using Logging;
-    using Octokit;
-    using Issue = IssueTrackers.Issue;
 
-    public class GitHubIssueTracker : IssueTrackerBase
+    public class GitHubIssueTracker : IIssueTracker
     {
-        private static readonly ILog Log = LogProvider.GetCurrentClassLogger();
+        private readonly Dictionary<string, Octokit.User> _userCache = new Dictionary<string, Octokit.User>();
+        private readonly Octokit.GitHubClient _gitHubClient;
 
-        private readonly Dictionary<string, User> _userCache = new Dictionary<string, User>();
-
-        public GitHubIssueTracker(IIssueTrackerContext issueTrackerContext)
-            : base(issueTrackerContext)
+        public GitHubIssueTracker(string organisation, string repository, string server, AuthenticationContext authenticationInfo)
         {
-            
-        }
+            Organisation = organisation;
+            Repository = repository;
+            var productInformation = new Octokit.ProductHeaderValue("GitReleaseNotes");
+            _gitHubClient = string.IsNullOrEmpty(server) ?
+                new Octokit.GitHubClient(productInformation) :
+                new Octokit.GitHubClient(productInformation, new Uri(server));
 
-        public override async Task<IEnumerable<Issue>> GetIssuesAsync(IssueTrackerFilter filter)
-        {
-            var gitHubClient = new GitHubClient(new ProductHeaderValue("GitReleaseNotes"));
-
-            var authentication = IssueTrackerContext.Authentication;
-            if (authentication != null)
+            if (authenticationInfo != null)
             {
-                if (authentication.IsTokenAuthentication())
+                if (authenticationInfo.IsTokenAuthentication())
                 {
-                    gitHubClient.Credentials = new Octokit.Credentials(authentication.Token);
+                    _gitHubClient.Credentials = new Octokit.Credentials(authenticationInfo.Token);
                 }
 
-                if (authentication.IsUsernameAndPasswordAuthentication())
+                if (authenticationInfo.IsUsernameAndPasswordAuthentication())
                 {
-                    gitHubClient.Credentials = new Octokit.Credentials(authentication.Username, authentication.Password);
+                    _gitHubClient.Credentials = new Octokit.Credentials(authenticationInfo.Username, authenticationInfo.Password);
                 }
             }
+        }
 
-            string organisation;
-            string repository;
-            GetRepository(out organisation, out repository);
+        public string Organisation { get; private set; }
+        public string Repository { get; private set; }
 
+        public async Task<IEnumerable<Issue>> GetIssuesAsync(IssueTrackerFilter filter)
+        {
             var repositoryIssueRequest = PrepareFilter(filter);
-            var forRepository = await gitHubClient.Issue.GetAllForRepository(organisation, repository, repositoryIssueRequest);
+            var forRepository = await _gitHubClient.Issue.GetAllForRepository(Organisation, Repository, repositoryIssueRequest);
 
             var readOnlyList = forRepository.Where(i => i.ClosedAt > filter.Since);
 
@@ -56,14 +52,14 @@
                 Title = i.Title,
                 IssueType = i.PullRequest == null ? IssueType.Issue : IssueType.PullRequest,
                 Labels = i.Labels.Select(l => l.Name).ToArray(),
-                Contributors = i.PullRequest == null ? new GitTools.IssueTrackers.Contributor[0] : new []
+                Contributors = i.PullRequest == null ? new Contributor[0] : new[]
                 {
-                    new GitTools.IssueTrackers.Contributor(GetUserName(gitHubClient, i.User), i.User.Login, i.User.HtmlUrl)
+                    new Contributor(GetUserName(_gitHubClient, i.User), i.User.Login, i.User.HtmlUrl)
                 }
             });
         }
 
-        private string GetUserName(GitHubClient client, User u)
+        private string GetUserName(Octokit.GitHubClient client, Octokit.User u)
         {
             var login = u.Login;
             if (!_userCache.ContainsKey(login))
@@ -80,74 +76,49 @@
             return null;
         }
 
-        private RepositoryIssueRequest PrepareFilter(IssueTrackerFilter filter)
+        private Octokit.RepositoryIssueRequest PrepareFilter(IssueTrackerFilter filter)
         {
-            var repositoryIssueRequest = new RepositoryIssueRequest
+            var repositoryIssueRequest = new Octokit.RepositoryIssueRequest
             {
-                Filter = IssueFilter.All,
+                Filter = Octokit.IssueFilter.All,
                 Since = filter.Since,
             };
 
             if (filter.IncludeOpen && filter.IncludeClosed)
             {
-                repositoryIssueRequest.State = ItemState.All;
+                repositoryIssueRequest.State = Octokit.ItemState.All;
             }
             else if (filter.IncludeOpen)
             {
-                repositoryIssueRequest.State = ItemState.Open;
+                repositoryIssueRequest.State = Octokit.ItemState.Open;
             }
             else if (filter.IncludeClosed)
             {
-                repositoryIssueRequest.State = ItemState.Closed;
+                repositoryIssueRequest.State = Octokit.ItemState.Closed;
             }
 
             return repositoryIssueRequest;
         }
 
-        private void GetRepository(out string organisation, out string repository)
+        public static IIssueTracker Factory(string url, string project, AuthenticationContext authentication)
         {
-            //if (RemotePresentWhichMatches)
-            //{
-            //    if (TryRemote(out organisation, out repository, "upstream"))
-            //    {
-            //        return;
-            //    }
-
-            //    if (TryRemote(out organisation, out repository, "origin"))
-            //    {
-            //        return;
-            //    }
-
-            //    var remoteName = _gitRepository.Network.Remotes.First(r => r.Url.ToLower().Contains("github.com")).Name;
-            //    if (TryRemote(out organisation, out repository, remoteName))
-            //    {
-            //        return;
-            //    }
-            //}
-
-            var repoParts = IssueTrackerContext.ProjectId.Split('/');
-            organisation = repoParts[0];
-            repository = repoParts[1];
+            var split = project.Split('/');
+            return new GitHubIssueTracker(split[0], split[1], url, authentication);
         }
 
-        //private bool TryRemote(out string organisation, out string repository, string remoteName)
-        //{
-        //    var remote = _gitRepository.Network.Remotes[remoteName];
-        //    if (remote != null && remote.Url.ToLower().Contains("github.com"))
-        //    {
-        //        var urlWithoutGitExtension = remote.Url.EndsWith(".git") ? remote.Url.Substring(0, remote.Url.Length - 4) : remote.Url;
-        //        var match = Regex.Match(urlWithoutGitExtension, "github.com[/:](?<org>.*?)/(?<repo>.*)");
-        //        if (match.Success)
-        //        {
-        //            organisation = match.Groups["org"].Value;
-        //            repository = match.Groups["repo"].Value;
-        //            return true;
-        //        }
-        //    }
+        private static readonly Regex GithubDotComRepo = new Regex("github.com[/:](?<org>.+?)/(?<repo>.+?)/?$");
+        public static bool TryCreate(string url, AuthenticationContext authentication, out IIssueTracker issueTracker)
+        {
+            var urlWithoutGitExtension = url.EndsWith(".git") ? url.Substring(0, url.Length - 4) : url;
+            var match = GithubDotComRepo.Match(urlWithoutGitExtension);
+            if (match.Success)
+            {
+                issueTracker = new GitHubIssueTracker(match.Groups["org"].Value, match.Groups["repo"].Value, null, authentication);
+                return true;
+            }
 
-        //    organisation = null;
-        //    repository = null;
-        //    return false;
-        //}
+            issueTracker = null;
+            return false;
+        }
     }
 }
