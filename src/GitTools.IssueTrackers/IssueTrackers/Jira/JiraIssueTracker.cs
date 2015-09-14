@@ -1,10 +1,12 @@
 ﻿namespace GitTools.IssueTrackers.Jira
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
     using Jira = Atlassian.Jira;
     using Logging;
+    using Version = Version;
 
     public class JiraIssueTracker : IIssueTracker
     {
@@ -12,9 +14,9 @@
         private static readonly ILog Log = LogProvider.GetCurrentClassLogger();
 
         private readonly string _server;
-        private readonly AuthenticationContext _authenticationInfo;
+        private readonly AuthSettings _authenticationInfo;
 
-        public JiraIssueTracker(string server, string project, AuthenticationContext authenticationInfo)
+        public JiraIssueTracker(string server, string project, AuthSettings authenticationInfo)
         {
             // TODO Project?
             _server = server;
@@ -89,7 +91,7 @@
 
             if (!filter.IncludeOpen && !filter.IncludeClosed)
             {
-                throw new GitToolsException("Cannot exclude both open and closed issues, nothing will be returned");
+                throw new Exception("Cannot exclude both open and closed issues, nothing will be returned");
             }
 
             if (filter.IncludeOpen)
@@ -123,7 +125,7 @@
                     select issueStatus).ToList();
         }
 
-        public static IIssueTracker Factory(string url, string project, AuthenticationContext authentication)
+        public static IIssueTracker Factory(string url, string project, AuthSettings authentication)
         {
             return new JiraIssueTracker(url, project, authentication);
         }
