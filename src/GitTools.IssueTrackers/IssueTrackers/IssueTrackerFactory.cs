@@ -11,8 +11,8 @@
     /// </summary>
     public static class IssueTrackerFactory
     {
-        delegate IIssueTracker IssueTrackerFactoryDelegate(string url, string project, AuthenticationContext authentication);
-        delegate bool TryCreateIssueTrackerDelegate(string url, AuthenticationContext authentication, out IIssueTracker issueTracker);
+        delegate IIssueTracker IssueTrackerFactoryDelegate(string url, string project, AuthSettings authentication);
+        delegate bool TryCreateIssueTrackerDelegate(string url, AuthSettings authentication, out IIssueTracker issueTracker);
         static readonly Dictionary<IssueTrackerType, IssueTrackerFactoryDelegate> Factories = new Dictionary<IssueTrackerType, IssueTrackerFactoryDelegate>
         {
             { IssueTrackerType.GitHub, GitHubIssueTracker.Factory },
@@ -40,7 +40,7 @@
         /// <param name="authentication">Authentication information</param>
         /// <param name="issueTracker">The issue tracker if successful</param>
         /// <returns>True on success</returns>
-        public static bool TryCreateIssueTrackerFromUrl(string url, [CanBeNull] AuthenticationContext authentication, out IIssueTracker issueTracker)
+        public static bool TryCreateIssueTrackerFromUrl(string url, [CanBeNull] AuthSettings authentication, out IIssueTracker issueTracker)
         {
             foreach (var tryCreateFactory in TryCreateFactories)
             {

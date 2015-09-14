@@ -12,7 +12,7 @@
         private readonly Dictionary<string, Octokit.User> _userCache = new Dictionary<string, Octokit.User>();
         private readonly Octokit.GitHubClient _gitHubClient;
 
-        public GitHubIssueTracker(string organisation, string repository, string server, AuthenticationContext authenticationInfo)
+        public GitHubIssueTracker(string organisation, string repository, string server, AuthSettings authenticationInfo)
         {
             Organisation = organisation;
             Repository = repository;
@@ -23,12 +23,12 @@
 
             if (authenticationInfo != null)
             {
-                if (authenticationInfo.IsTokenAuthentication())
+                if (authenticationInfo.IsTokenAuthentication)
                 {
                     _gitHubClient.Credentials = new Octokit.Credentials(authenticationInfo.Token);
                 }
 
-                if (authenticationInfo.IsUsernameAndPasswordAuthentication())
+                if (authenticationInfo.IsUsernameAndPasswordAuthentication)
                 {
                     _gitHubClient.Credentials = new Octokit.Credentials(authenticationInfo.Username, authenticationInfo.Password);
                 }
@@ -100,14 +100,14 @@
             return repositoryIssueRequest;
         }
 
-        public static IIssueTracker Factory(string url, string project, AuthenticationContext authentication)
+        public static IIssueTracker Factory(string url, string project, AuthSettings authentication)
         {
             var split = project.Split('/');
             return new GitHubIssueTracker(split[0], split[1], url, authentication);
         }
 
         private static readonly Regex GithubDotComRepo = new Regex("github.com[/:](?<org>.+?)/(?<repo>.+?)/?$");
-        public static bool TryCreate(string url, AuthenticationContext authentication, out IIssueTracker issueTracker)
+        public static bool TryCreate(string url, AuthSettings authentication, out IIssueTracker issueTracker)
         {
             var urlWithoutGitExtension = url.EndsWith(".git") ? url.Substring(0, url.Length - 4) : url;
             var match = GithubDotComRepo.Match(urlWithoutGitExtension);

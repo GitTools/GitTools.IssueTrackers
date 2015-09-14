@@ -1,5 +1,7 @@
 ﻿namespace GitTools.IssueTrackers
 {
+    using GitHub;
+
     /// <summary>
     ///     Arguments class for creating an issue tracker
     /// </summary>
@@ -23,6 +25,6 @@
 
         public IssueTrackerType IssueTrackerType { get; set; }
 
-        public AuthenticationContext Authentication { get; set; }
+        public AuthSettings Authentication { get; set; }
     }
 }
