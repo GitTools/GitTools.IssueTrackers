@@ -21,20 +21,16 @@
         static readonly TryCreateIssueTrackerDelegate[] TryCreateFactories = { GitHubIssueTracker.TryCreate };
 
         /// <summary>
-        /// Creates an issue tracker
+        /// Creates an issue tracker based off the settings
         /// </summary>
-        /// <param name="url">Can be base server url if identifier is parsed</param>
-        /// <param name="project">If url is a base/server url, this can be the project id/repository/other identifier</param>
-        /// <param name="issueTrackerType">The type of the issue tracker</param>
-        /// <param name="authentication">Authentication information</param>
         /// <returns>The issue tracker API</returns>
         [Pure]
-        public static IIssueTracker CreateIssueTracker(string url, [CanBeNull] string project, IssueTrackerType issueTrackerType, AuthenticationContext authentication = null)
+        public static IIssueTracker CreateIssueTracker(IssueTrackerSettings issueTrackerSettings)
         {
-            if (!Factories.ContainsKey(issueTrackerType))
-                throw new ArgumentOutOfRangeException("issueTrackerType", issueTrackerType, "This issue tracker is not supported yet!");
+            if (!Factories.ContainsKey(issueTrackerSettings.IssueTrackerType))
+                throw new ArgumentOutOfRangeException("issueTrackerSettings.IssueTrackerType", issueTrackerSettings.IssueTrackerType, "This issue tracker is not supported yet!");
 
-            return Factories[issueTrackerType](url, project, authentication);
+            return Factories[issueTrackerSettings.IssueTrackerType](issueTrackerSettings.Url, issueTrackerSettings.Project, issueTrackerSettings.Authentication);
         }
 
         /// <summary>

@@ -1,9 +1,8 @@
-﻿using Xunit;
-
-namespace GitTools.IssueTrackers.Tests
+﻿namespace GitTools.IssueTrackers.Tests
 {
     using GitHub;
     using Shouldly;
+    using Xunit;
 
     public class IssueTrackerFactoryTests
     {

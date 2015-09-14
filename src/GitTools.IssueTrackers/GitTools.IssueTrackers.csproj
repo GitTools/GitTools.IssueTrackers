@@ -73,6 +73,7 @@
     <Compile Include="Constants.cs" />
     <Compile Include="IssueTrackers\GitHub\GitHubIssueTracker.cs" />
     <Compile Include="IssueTrackers\IssueTrackerFactory.cs" />
+    <Compile Include="IssueTrackers\IssueTrackerSettings.cs" />
     <Compile Include="IssueTrackers\Jira\JiraIssueTracker.cs" />
     <Compile Include="Models\Contributor.cs" />
     <Compile Include="Models\Issue.cs" />
