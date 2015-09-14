@@ -1,32 +1,34 @@
 ﻿namespace GitTools.IssueTrackers.Jira
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using Atlassian.Jira;
+    using Jira = Atlassian.Jira;
     using Logging;
-    using Issue = IssueTrackers.Issue;
-    using IssueType = IssueTrackers.IssueType;
-    using Version = IssueTrackers.Version;
 
-    public class JiraIssueTracker : IssueTrackerBase
+    public class JiraIssueTracker : IIssueTracker
     {
+        private static readonly HashSet<string> KnownClosedStatuses = new HashSet<string>(new[] { "resolved", "closed", "done" });
         private static readonly ILog Log = LogProvider.GetCurrentClassLogger();
 
-        private static readonly HashSet<string> KnownClosedStatuses = new HashSet<string>(new [] { "resolved", "closed", "done" }); 
+        private readonly string _server;
+        private readonly AuthenticationContext _authenticationInfo;
 
-        public JiraIssueTracker(IIssueTrackerContext issueTrackerContext)
-            : base(issueTrackerContext)
+        public JiraIssueTracker(string server, string project, AuthenticationContext authenticationInfo)
         {
+            // TODO Project?
+            _server = server;
+            _authenticationInfo = authenticationInfo;
         }
 
-        public override Task<IEnumerable<Issue>> GetIssuesAsync(IssueTrackerFilter filter)
+        public Task<IEnumerable<Issue>> GetIssuesAsync(IssueTrackerFilter filter)
         {
-            Log.DebugFormat("Connecting to Jira server '{0}'", IssueTrackerContext.Server);
+            Log.DebugFormat("Connecting to Jira server '{0}'", _server);
 
-            var jira = new Jira(IssueTrackerContext.Server, IssueTrackerContext.Authentication.Username, IssueTrackerContext.Authentication.Password);
-            jira.MaxIssuesPerRequest = 500;
+            var jira = new Jira.Jira(_server, _authenticationInfo.Username, _authenticationInfo.Password)
+            {
+                MaxIssuesPerRequest = 500
+            };
 
             Log.Debug("Retrieving statuses");
 
@@ -72,7 +74,7 @@
             return Task.FromResult(issues.AsEnumerable());
         }
 
-        private string PrepareFilter(IssueTrackerFilter filter, IEnumerable<IssueStatus> openedStatuses, IEnumerable<IssueStatus> closedStatuses)
+        private string PrepareFilter(IssueTrackerFilter filter, IEnumerable<Jira.IssueStatus> openedStatuses, IEnumerable<Jira.IssueStatus> closedStatuses)
         {
             var finalFilter = string.Empty;
             if (!string.IsNullOrWhiteSpace(filter.Filter))
@@ -103,7 +105,7 @@
             return finalFilter;
         }
 
-        private List<IssueStatus> GetOpenedStatuses(Jira jira)
+        private List<Jira.IssueStatus> GetOpenedStatuses(Jira.Jira jira)
         {
             var issueStatuses = jira.GetIssueStatuses().ToList();
 
@@ -112,13 +114,18 @@
                     select issueStatus).ToList();
         } 
 
-        private List<IssueStatus> GetClosedStatuses(Jira jira)
+        private List<Jira.IssueStatus> GetClosedStatuses(Jira.Jira jira)
         {
             var issueStatuses = jira.GetIssueStatuses().ToList();
 
             return (from issueStatus in issueStatuses
                     where KnownClosedStatuses.Contains(issueStatus.Name.ToLower())
                     select issueStatus).ToList();
+        }
+
+        public static IIssueTracker Factory(string url, string project, AuthenticationContext authentication)
+        {
+            return new JiraIssueTracker(url, project, authentication);
         }
     }
 }

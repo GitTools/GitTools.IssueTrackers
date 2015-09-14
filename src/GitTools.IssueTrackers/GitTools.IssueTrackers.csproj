@@ -71,18 +71,14 @@
   <ItemGroup>
     <Compile Include="App_Packages\LibLog.4.2\LibLog.cs" />
     <Compile Include="Constants.cs" />
-    <Compile Include="Context\Extensions\IIssueTrackerContextExtensions.cs" />
-    <Compile Include="Context\Interfaces\IIssueTrackerContext.cs" />
-    <Compile Include="Context\IssueTrackerContext.cs" />
     <Compile Include="IssueTrackers\GitHub\GitHubIssueTracker.cs" />
-    <Compile Include="IssueTrackers\IssueTrackerBase.cs" />
     <Compile Include="IssueTrackers\IssueTrackerFactory.cs" />
+    <Compile Include="IssueTrackers\IssueTrackerSettings.cs" />
     <Compile Include="IssueTrackers\Jira\JiraIssueTracker.cs" />
     <Compile Include="Models\Contributor.cs" />
     <Compile Include="Models\Issue.cs" />
     <Compile Include="IssueTrackers\Interfaces\IIssueNumberExtractor.cs" />
     <Compile Include="IssueTrackers\Interfaces\IIssueTracker.cs" />
-    <Compile Include="IssueTrackers\Interfaces\IIssueTrackerFactory.cs" />
     <Compile Include="Models\IssueTrackerFilter.cs" />
     <Compile Include="Models\Version.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
