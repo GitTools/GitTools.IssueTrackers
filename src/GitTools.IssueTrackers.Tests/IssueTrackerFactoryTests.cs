@@ -17,5 +17,16 @@
             githubIssueTracker.Organisation.ShouldBe("GitTools");
             githubIssueTracker.Repository.ShouldBe("GitTools.IssueTrackers");
         }
+        [Fact]
+        public void CanDetectGitHubFromRemote()
+        {
+            IIssueTracker issueTracker;
+            var created = IssueTrackerFactory.TryCreateIssueTrackerFromUrl("git@github.com:GitTools/GitTools.IssueTrackers.git", null, out issueTracker);
+
+            created.ShouldBeTrue();
+            var githubIssueTracker = issueTracker.ShouldBeOfType<GitHubIssueTracker>();
+            githubIssueTracker.Organisation.ShouldBe("GitTools");
+            githubIssueTracker.Repository.ShouldBe("GitTools.IssueTrackers");
+        }
     }
 }
