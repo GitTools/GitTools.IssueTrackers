@@ -19,7 +19,7 @@ build:
   project: src\GitTools.IssueTrackers.sln
 
 after_build:
-  - cmd: gitlink src -u https://github.com/gittools/gittools.issuetrackers -b %APPVEYOR_REPO_BRANCH% -s %APPVEYOR_REPO_COMMIT% -f GitTools.IssueTrackers.sln
+  - cmd: gitlink . -u https://github.com/gittools/gittools.issuetrackers -b %APPVEYOR_REPO_BRANCH% -s %APPVEYOR_REPO_COMMIT% -f src\GitTools.IssueTrackers.sln
   - cmd: nuget pack src\GitTools.IssueTrackers\GitTools.IssueTrackers.nuspec -BasePath output\%CONFIGURATION%\GitTools.IssueTrackers\ -version "%GitVersion_NuGetVersion%"
   - cmd: appveyor PushArtifact "GitTools.IssueTrackers.%GitVersion_NuGetVersion%.nupkg"
 
