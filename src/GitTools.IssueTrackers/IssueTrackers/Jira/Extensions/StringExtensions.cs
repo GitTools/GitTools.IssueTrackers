@@ -1,6 +1,6 @@
 ﻿namespace GitTools.IssueTrackers.Jira
 {
-    public static class StringExtensions
+    internal static class StringExtensions
     {
         public static string AddJiraFilter(this string value, string additionalValue, string joinText = "AND")
         {
