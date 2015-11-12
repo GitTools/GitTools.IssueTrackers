@@ -29,7 +29,7 @@
         {
             Log.DebugFormat("Connecting to Jira server '{0}'", _server);
 
-            var jira = Atlassian.Jira.Jira.CreateRestClient(_server, _authenticationInfo.Username, 
+            var jira = Atlassian.Jira.Jira.CreateRestClient(_server, _authenticationInfo.Username,
                 _authenticationInfo.Password, new Jira.JiraRestClientSettings());
 
             var jiraRestClient = jira.RestClient;
@@ -47,9 +47,28 @@
 
             Log.DebugFormat("Searching for issues using filter '{0}'", filter);
 
+            const int MaxIssues = 200;
+
             // TODO: Once the Atlassian.Sdk issue type contains all info, remove custom JiraIssue
-            var retrievedIssues = jiraRestClient.GetIssues(finalFilter, 0, 200);
-            //var retrievedIssues = await jiraRestClient.GetIssuesFromJqlAsync(finalFilter, 200, 0, CancellationToken.None);
+            var retrievedIssues = jiraRestClient.GetIssues(finalFilter, 0, MaxIssues);
+            //var retrievedIssues = await jiraRestClient.GetIssuesFromJqlAsync(finalFilter, MaxIssues, 0, CancellationToken.None);
+
+            int lastRetrievedIssuesCount = retrievedIssues.Count;
+
+            while (lastRetrievedIssuesCount % MaxIssues == 0)
+            {
+                var newlyRetrievedIssues = jiraRestClient.GetIssues(finalFilter, lastRetrievedIssuesCount, MaxIssues);
+                //var newlyRetrievedIssues = await jiraRestClient.GetIssuesFromJqlAsync(finalFilter, MaxIssues, lastRetrievedIssuesCount, CancellationToken.None);
+                if (newlyRetrievedIssues.Count == 0)
+                {
+                    break;
+                }
+
+                retrievedIssues.AddRange(newlyRetrievedIssues);
+
+                lastRetrievedIssuesCount = retrievedIssues.Count;
+            }
+
             foreach (var issue in retrievedIssues)
             {
                 var gitIssue = new Issue(issue.key)
