@@ -15,7 +15,7 @@
     <licenseUrl>https://github.com/GitTools/GitTools.Core/blob/develop/LICENSE</licenseUrl>
     <iconUrl>https://raw.github.com/GitTools/GitTools.Core/develop/GitTools_logo.png</iconUrl>
     <dependencies>
-      <dependency id="Atlassian.SDK" version="2.5.0" />
+      <dependency id="Atlassian.SDK" version="4.6.0" />
       <dependency id="LibGit2Sharp" version="0.21.0.176" />
       <dependency id="Octokit" version="0.15.0" />
     </dependencies>
