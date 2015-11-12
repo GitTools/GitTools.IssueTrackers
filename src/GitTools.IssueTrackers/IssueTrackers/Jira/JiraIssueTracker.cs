@@ -11,8 +11,10 @@
 
     public class JiraIssueTracker : IIssueTracker
     {
-        private static readonly HashSet<string> KnownClosedStatuses = new HashSet<string>(new[] { "resolved", "closed", "done" });
         private static readonly ILog Log = LogProvider.GetCurrentClassLogger();
+
+        private static readonly HashSet<string> KnownClosedStatuses = new HashSet<string>(new[] { "resolved", "closed", "done" });
+        private static readonly HashSet<string> AcceptedResolutions = new HashSet<string>(new[] { "fixed" });
 
         private readonly string _project;
         private readonly string _server;
@@ -37,11 +39,13 @@
             Log.Debug("Retrieving statuses");
 
             var statuses = (await jiraRestClient.GetIssueStatusesAsync(CancellationToken.None)).ToList();
+            var resolutions = (await jiraRestClient.GetIssueResolutionsAsync(CancellationToken.None)).ToList();
 
             var openedStatuses = GetOpenedStatuses(statuses);
             var closedStatuses = GetClosedStatuses(statuses);
+            var acceptedResolutions = GetAcceptedResolutions(resolutions);
 
-            var finalFilter = PrepareFilter(filter, openedStatuses, closedStatuses);
+            var finalFilter = PrepareFilter(filter, openedStatuses, closedStatuses, acceptedResolutions);
 
             var issues = new List<Issue>();
 
@@ -106,7 +110,23 @@
             return issues.AsEnumerable();
         }
 
-        private string PrepareFilter(IssueTrackerFilter filter, IEnumerable<Jira.IssueStatus> openedStatuses, IEnumerable<Jira.IssueStatus> closedStatuses)
+        private IEnumerable<Jira.IssueResolution> GetAcceptedResolutions(List<Jira.IssueResolution> resolutions)
+        {
+            var acceptedResolutions = new List<Jira.IssueResolution>();
+
+            foreach (var resolution in resolutions)
+            {
+                if (AcceptedResolutions.Contains(resolution.Name.ToLower()))
+                {
+                    acceptedResolutions.Add(resolution);
+                }
+            }
+
+            return acceptedResolutions;
+        }
+
+        private string PrepareFilter(IssueTrackerFilter filter, IEnumerable<Jira.IssueStatus> openedStatuses, 
+            IEnumerable<Jira.IssueStatus> closedStatuses, IEnumerable<Jira.IssueResolution> acceptedResolutions)
         {
             var finalFilter = string.Empty;
             if (!string.IsNullOrWhiteSpace(filter.Filter))
@@ -134,6 +154,11 @@
             if (filter.Since.HasValue)
             {
                 finalFilter = finalFilter.AddJiraFilter(string.Format("resolutiondate >= '{0}'", filter.Since.Value.ToString("yyyy-MM-dd")));
+            }
+
+            if (acceptedResolutions.Any())
+            {
+                finalFilter = finalFilter.AddJiraFilter(string.Format("resolution in ({0})", string.Join(", ", acceptedResolutions.Select(x => string.Format("\"{0}\"", x)))));
             }
 
             finalFilter = finalFilter.AddJiraFilter(string.Format("project = {0}", _project));
