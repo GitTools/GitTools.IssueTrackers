@@ -23,7 +23,7 @@
         public void CanDetectJiraFromUrl()
         {
             IIssueTracker issueTracker;
-            var created = IssueTrackerFactory.TryCreateIssueTrackerFromUrl("https://catelproject.atlassian.com/", "CTL", null, out issueTracker);
+            var created = IssueTrackerFactory.TryCreateIssueTrackerFromUrl("https://catelproject.atlassian.net/", "CTL", null, out issueTracker);
 
             created.ShouldBeTrue();
             var jiraIssueTracker = issueTracker.ShouldBeOfType<JiraIssueTracker>();
