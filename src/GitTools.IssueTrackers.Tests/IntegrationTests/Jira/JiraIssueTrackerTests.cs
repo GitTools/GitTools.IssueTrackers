@@ -16,7 +16,7 @@
             var issueFilter = new IssueTrackerFilter
             {
                 IncludeClosed = true,
-                Since = new DateTimeOffset(new DateTime(2015, 10, 1))
+                Since = new DateTimeOffset(DateTime.Today.AddMonths(-1))
             };
 
             var issues = await issueTracker.GetIssuesAsync(issueFilter);

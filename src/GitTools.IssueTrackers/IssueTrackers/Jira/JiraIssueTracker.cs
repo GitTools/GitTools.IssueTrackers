@@ -5,7 +5,6 @@
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using Atlassian.Jira.Remote;
     using Jira = Atlassian.Jira;
     using Logging;
     using Version = Version;
@@ -30,10 +29,8 @@
         {
             Log.DebugFormat("Connecting to Jira server '{0}'", _server);
 
-            var jira = new Jira.Jira(_server, _authenticationInfo.Username, _authenticationInfo.Password)
-            {
-                MaxIssuesPerRequest = 500
-            };
+            var jira = Atlassian.Jira.Jira.CreateRestClient(_server, _authenticationInfo.Username, 
+                _authenticationInfo.Password, new Jira.JiraRestClientSettings());
 
             var jiraRestClient = jira.RestClient;
 
@@ -52,7 +49,7 @@
 
             // TODO: Once the Atlassian.Sdk issue type contains all info, remove custom JiraIssue
             var retrievedIssues = jiraRestClient.GetIssues(finalFilter, 0, 200);
-            //var retrievedIssues = await jiraRestClient.GetIssuesFromJqlSearchAsync(finalFilter, 200, 0, CancellationToken.None);
+            //var retrievedIssues = await jiraRestClient.GetIssuesFromJqlAsync(finalFilter, 200, 0, CancellationToken.None);
             foreach (var issue in retrievedIssues)
             {
                 var gitIssue = new Issue(issue.key)
