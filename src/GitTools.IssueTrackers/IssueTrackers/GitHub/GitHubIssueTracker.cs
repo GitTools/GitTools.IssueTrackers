@@ -107,7 +107,7 @@
         }
 
         private static readonly Regex GithubDotComRepo = new Regex("github.com[/:](?<org>.+?)/(?<repo>.+?)/?$");
-        public static bool TryCreate(string url, AuthSettings authentication, out IIssueTracker issueTracker)
+        public static bool TryCreate(string url, string project, AuthSettings authentication, out IIssueTracker issueTracker)
         {
             var urlWithoutGitExtension = url.EndsWith(".git") ? url.Substring(0, url.Length - 4) : url;
             var match = GithubDotComRepo.Match(urlWithoutGitExtension);

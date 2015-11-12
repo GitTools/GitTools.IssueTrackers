@@ -140,5 +140,21 @@
         {
             return new JiraIssueTracker(url, project, authentication);
         }
+
+        public static bool TryCreate(string url, string project, AuthSettings authentication, out IIssueTracker issueTracker)
+        {
+            // For now just check if it contains atlassian.com
+            if (!string.IsNullOrWhiteSpace(url))
+            {
+                if (url.ToLower().Contains(".atlassian.com"))
+                {
+                    issueTracker = new JiraIssueTracker(url, project, authentication);
+                    return true;
+                }
+            }
+
+            issueTracker = null;
+            return false;
+        }
     }
 }
