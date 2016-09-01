@@ -115,15 +115,14 @@ namespace GitTools.IssueTrackers.Bitbucket
             foreach (var issue in responseObject.issues)
             {
                 DateTimeOffset lastChange = DateTimeOffset.Parse(issue.utc_last_updated.ToString());
-
-                string summary = issue.content;
-                string id = issue.local_id.ToString();
-                string title = issue.title;
-                issues.Add(new Issue(id)
+                
+                issues.Add(new Issue(issue.local_id.ToString())
                 {
                     IssueType = IssueType.Issue,
                     Title = issue.title,
-                    Url = new Uri(baseUrl, string.Format("/repositories/{0}/{1}/issue/{2}/{3}", AccountName, Repository, id, title)).ToString()
+                    Description = issue.content,
+                    DateClosed = lastChange,
+                    Url = new Uri(baseUrl, string.Format("/repositories/{0}/{1}/issue/{2}/{3}", AccountName, Repository, issue.local_id.ToString(), issue.title)).ToString()
                 });
             }
 
