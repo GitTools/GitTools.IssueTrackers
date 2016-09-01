@@ -1,5 +1,6 @@
 ﻿namespace GitTools.IssueTrackers.Tests
 {
+    using Bitbucket;
     using GitHub;
     using Jira;
     using Shouldly;
@@ -28,6 +29,19 @@
             created.ShouldBeTrue();
             var jiraIssueTracker = issueTracker.ShouldBeOfType<JiraIssueTracker>();
             jiraIssueTracker.ShouldNotBeNull();
+        }
+
+        [Fact]
+        public void CanDetectBitbucketFromUrl()
+        {
+            IIssueTracker issueTracker;
+            var created = IssueTrackerFactory.TryCreateIssueTrackerFromUrl("https://bitbucket.org/MODEMLEVEL/CHICKSMOKE", null, null, out issueTracker);
+
+            created.ShouldBeTrue();
+            var bitbucketIssueTracker = issueTracker.ShouldBeOfType<BitbucketIssueTracker>();
+            bitbucketIssueTracker.ShouldNotBeNull();
+            bitbucketIssueTracker.AccountName.ShouldBe("MODEMLEVEL");
+            bitbucketIssueTracker.Repository.ShouldBe("CHICKSMOKE");
         }
     }
 }

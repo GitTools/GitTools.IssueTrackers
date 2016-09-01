@@ -55,8 +55,8 @@
       <HintPath>..\packages\Octokit.0.15.0\lib\net45\Octokit.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="RestSharp, Version=105.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RestSharp.105.1.0\lib\net45\RestSharp.dll</HintPath>
+    <Reference Include="RestSharp, Version=105.2.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RestSharp.105.2.3\lib\net45\RestSharp.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -72,6 +72,7 @@
     <Compile Include="App_Packages\LibLog.4.2\LibLog.cs" />
     <Compile Include="AuthSettings.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="IssueTrackers\Bitbucket\BitBucketIssueTracker.cs" />
     <Compile Include="IssueTrackers\GitHub\GitHubIssueTracker.cs" />
     <Compile Include="IssueTrackers\IssueTrackerFactory.cs" />
     <Compile Include="IssueTrackers\IssueTrackerSettings.cs" />
