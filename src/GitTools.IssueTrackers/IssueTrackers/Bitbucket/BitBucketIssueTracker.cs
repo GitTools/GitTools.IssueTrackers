@@ -34,37 +34,19 @@ namespace GitTools.IssueTrackers.Bitbucket
         {
             return await Task.Run(() =>
             {
-                var finalFilter = PrepareFilter(filter);
-
-                var baseUrl = new Uri(ApiUrl, UriKind.Absolute);
-                var restClient = new RestClient(baseUrl.AbsoluteUri);
+                var finalFilter = PrepareFilter(filter);                
                 var issuesUrl = string.Format(IssuesUrl, AccountName, Repository, 0, finalFilter);
-                var request = new RestRequest(issuesUrl);
-
-                if(_authenticationSettings.IsUsernameAndPasswordAuthentication)
-                    GenerateClassicalRequest(request, issuesUrl);
-
-                var response = restClient.Execute(request);
-                if (response.StatusCode != HttpStatusCode.OK) { throw new Exception("Failed to query BitBucket: " + response.StatusDescription); }
-
-                dynamic responseObject = JsonConvert.DeserializeObject<dynamic>(response.Content);
 
                 var issues = new List<Issue>();
-                issues.AddRange(GetIssues(responseObject));
+                issues.AddRange(GetIssues(issuesUrl));
 
                 int lastRetrievedIssuesCount = issues.Count;
 
                 while (lastRetrievedIssuesCount % MaxIssues == 0)
                 {
                     issuesUrl = string.Format(IssuesUrl, AccountName, Repository, lastRetrievedIssuesCount, finalFilter);
-                    request = new RestRequest(issuesUrl);
-                    if (_authenticationSettings.IsUsernameAndPasswordAuthentication)
-                        GenerateClassicalRequest(request, issuesUrl);
-                    response = restClient.Execute(request);
-                    if (response.StatusCode != HttpStatusCode.OK) { throw new Exception("Failed to query BitBucket: " + response.StatusDescription); }
+                    var newlyRetrievedIssues = GetIssues(issuesUrl);
 
-                    var newlyRetrievedIssues = GetIssues(JsonConvert.DeserializeObject<dynamic>(response.Content));
-                    
                     if (newlyRetrievedIssues.Count == 0)
                     {
                         break;
@@ -77,6 +59,23 @@ namespace GitTools.IssueTrackers.Bitbucket
 
                 return issues;
             });
+        }
+
+        private List<Issue> GetIssues(string issuesUrl)
+        {
+            var baseUrl = new Uri(ApiUrl, UriKind.Absolute);
+            var restClient = new RestClient(baseUrl.AbsoluteUri);
+            var request = new RestRequest(issuesUrl);
+            
+            if (_authenticationSettings.IsUsernameAndPasswordAuthentication)
+                GenerateClassicalRequest(request, issuesUrl);
+
+            var response = restClient.Execute(request);
+            if (response.StatusCode != HttpStatusCode.OK) { throw new Exception("Failed to query BitBucket: " + response.StatusDescription); }
+
+            dynamic responseObject = JsonConvert.DeserializeObject<dynamic>(response.Content);
+
+            return ParseIssues(responseObject);
         }
 
         private string PrepareFilter(IssueTrackerFilter filter)
@@ -107,7 +106,7 @@ namespace GitTools.IssueTrackers.Bitbucket
             return finalFilter;
         }
 
-        private List<Issue> GetIssues(dynamic responseObject)
+        private List<Issue> ParseIssues(dynamic responseObject)
         {
             var baseUrl = new Uri(ApiUrl, UriKind.Absolute);
             var issues = new List<Issue>();
