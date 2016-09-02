@@ -72,6 +72,7 @@
     <Compile Include="App_Packages\LibLog.4.2\LibLog.cs" />
     <Compile Include="AuthSettings.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="IssueTrackers\Bitbucket\BitBucketIssueTracker.cs" />
     <Compile Include="IssueTrackers\GitHub\GitHubIssueTracker.cs" />
     <Compile Include="IssueTrackers\IssueTrackerFactory.cs" />
     <Compile Include="IssueTrackers\IssueTrackerSettings.cs" />

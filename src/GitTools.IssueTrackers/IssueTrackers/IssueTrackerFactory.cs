@@ -5,6 +5,7 @@
     using GitHub;
     using JetBrains.Annotations;
     using Jira;
+    using Bitbucket;
 
     /// <summary>
     /// Entry point into GitTools.IssueTracker
@@ -22,6 +23,7 @@
         {
             GitHubIssueTracker.TryCreate,
             JiraIssueTracker.TryCreate,
+            BitbucketIssueTracker.TryCreate,
         };
 
         /// <summary>

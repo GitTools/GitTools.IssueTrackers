@@ -54,6 +54,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IntegrationTests\Bitbucket\BitbucketIssueTrackerTests.cs" />
     <Compile Include="IntegrationTests\Jira\JiraIssueTrackerTests.cs" />
     <Compile Include="IssueTrackerFactoryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
