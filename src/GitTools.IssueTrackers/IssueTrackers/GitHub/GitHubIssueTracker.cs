@@ -86,15 +86,15 @@
 
             if (filter.IncludeOpen && filter.IncludeClosed)
             {
-                repositoryIssueRequest.State = Octokit.ItemState.All;
+                repositoryIssueRequest.State = Octokit.ItemStateFilter.All;
             }
             else if (filter.IncludeOpen)
             {
-                repositoryIssueRequest.State = Octokit.ItemState.Open;
+                repositoryIssueRequest.State = Octokit.ItemStateFilter.Open;
             }
             else if (filter.IncludeClosed)
             {
-                repositoryIssueRequest.State = Octokit.ItemState.Closed;
+                repositoryIssueRequest.State = Octokit.ItemStateFilter.Closed;
             }
 
             return repositoryIssueRequest;

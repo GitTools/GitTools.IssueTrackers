@@ -1,12 +1,12 @@
 ﻿namespace GitTools.IssueTrackers.Jira
 {
+    using GitTools.IssueTrackers.Logging;
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Jira = Atlassian.Jira;
-    using Logging;
     using Version = Version;
 
     public class JiraIssueTracker : IIssueTracker
@@ -38,8 +38,9 @@
 
             Log.Debug("Retrieving statuses");
 
-            var statuses = (await jiraRestClient.GetIssueStatusesAsync(CancellationToken.None)).ToList();
-            var resolutions = (await jiraRestClient.GetIssueResolutionsAsync(CancellationToken.None)).ToList();
+           
+            var statuses = (await jira.Statuses.GetStatusesAsync()).ToList();
+            var resolutions = (await jira.Resolutions.GetResolutionsAsync()).ToList();
 
             var openedStatuses = GetOpenedStatuses(statuses);
             var closedStatuses = GetClosedStatuses(statuses);
@@ -54,14 +55,14 @@
             const int MaxIssues = 200;
 
             // TODO: Once the Atlassian.Sdk issue type contains all info, remove custom JiraIssue
-            var retrievedIssues = jiraRestClient.GetIssues(finalFilter, 0, MaxIssues);
+            var retrievedIssues = await jiraRestClient.GetIssues(finalFilter, 0, MaxIssues);
             //var retrievedIssues = await jiraRestClient.GetIssuesFromJqlAsync(finalFilter, MaxIssues, 0, CancellationToken.None);
 
             int lastRetrievedIssuesCount = retrievedIssues.Count;
 
             while (lastRetrievedIssuesCount % MaxIssues == 0)
             {
-                var newlyRetrievedIssues = jiraRestClient.GetIssues(finalFilter, lastRetrievedIssuesCount, MaxIssues);
+                var newlyRetrievedIssues = await jiraRestClient.GetIssues(finalFilter, lastRetrievedIssuesCount, MaxIssues);
                 //var newlyRetrievedIssues = await jiraRestClient.GetIssuesFromJqlAsync(finalFilter, MaxIssues, lastRetrievedIssuesCount, CancellationToken.None);
                 if (newlyRetrievedIssues.Count == 0)
                 {

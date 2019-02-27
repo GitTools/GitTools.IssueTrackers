@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
     using Atlassian.Jira;
     using Atlassian.Jira.Remote;
     using Newtonsoft.Json;
@@ -10,7 +11,7 @@
 
     public static partial class JiraExtensions
     {
-        public static List<JiraIssue> GetIssues(this IJiraRestClient jiraRestClient, string jql, int startAt = 0, int maxResults = 200)
+        public static async Task<List<JiraIssue>> GetIssues(this IJiraRestClient jiraRestClient, string jql, int startAt = 0, int maxResults = 200)
         {
             var issues = new List<JiraIssue>();
 
@@ -27,7 +28,7 @@
             //}
 
             var requestJson = JsonConvert.SerializeObject(searchRequest, GetJsonSettings());
-            var responseJson = jiraRestClient.ExecuteRequestRaw(Method.POST, "rest/api/2/search", requestJson);
+            var responseJson = await jiraRestClient.ExecuteRequestRaw(Method.POST, "rest/api/2/search", requestJson);
 
             var issuesJson = responseJson["issues"];
             foreach (var jsonElement in issuesJson.Children())
