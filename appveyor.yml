@@ -2,6 +2,7 @@ image: Visual Studio 2017
 
 install:
   - choco install gitversion.portable -pre -y
+  - ps: gitversion /l console /output buildserver
 
 platform:
   - Any CPU
@@ -24,7 +25,6 @@ dotnet_csproj:
 
 before_build:
   - nuget restore src\
-  - ps: gitversion /l console /output buildserver
 
 build:
   project: src\GitTools.IssueTrackers.sln
