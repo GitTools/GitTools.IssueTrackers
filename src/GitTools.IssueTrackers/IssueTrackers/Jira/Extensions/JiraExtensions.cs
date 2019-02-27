@@ -1,6 +1,7 @@
 ﻿namespace GitTools.IssueTrackers.Jira
 {
     using System.Net;
+    using System.Threading.Tasks;
     using Atlassian.Jira;
     using Atlassian.Jira.Remote;
     using Newtonsoft.Json;
@@ -20,7 +21,7 @@
             };
         }
 
-        public static JToken ExecuteRequestRaw(this IJiraRestClient jiraRestClient, Method method, string resource, string jsonRequestBody)
+        public static async Task<JToken> ExecuteRequestRaw(this IJiraRestClient jiraRestClient, Method method, string resource, string jsonRequestBody)
         {
             var restRequest = new RestRequest
             {
@@ -36,7 +37,7 @@
                 Value = jsonRequestBody
             });
 
-            var response = jiraRestClient.ExecuteRequest(restRequest);
+            var response = await jiraRestClient.ExecuteRequestAsync(restRequest);
             return response.StatusCode != HttpStatusCode.NoContent ? JToken.Parse(response.Content) : new JObject();
         }
     }

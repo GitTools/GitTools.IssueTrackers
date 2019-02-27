@@ -1,6 +1,4 @@
-install:
-  - choco install gitversion.portable -pre -y
-  - cinst gitlink -pre -y
+image: Visual Studio 2017
 
 platform:
   - Any CPU
@@ -13,15 +11,9 @@ assembly_info:
 
 before_build:
   - nuget restore src\
-  - ps: gitversion /l console /output buildserver /updateAssemblyInfo
 
 build:
   project: src\GitTools.IssueTrackers.sln
-
-after_build:
-  - cmd: gitlink . -u https://github.com/gittools/gittools.issuetrackers -b %APPVEYOR_REPO_BRANCH% -s %APPVEYOR_REPO_COMMIT% -f src\GitTools.IssueTrackers.sln
-  - cmd: nuget pack src\GitTools.IssueTrackers\GitTools.IssueTrackers.nuspec -BasePath output\%CONFIGURATION%\GitTools.IssueTrackers\ -version "%GitVersion_NuGetVersion%"
-  - cmd: appveyor PushArtifact "GitTools.IssueTrackers.%GitVersion_NuGetVersion%.nupkg"
 
 cache:
   - src\packages -> **\packages.config  # preserve "packages" directory in the root of build folder but will reset it if packages.config is modified
