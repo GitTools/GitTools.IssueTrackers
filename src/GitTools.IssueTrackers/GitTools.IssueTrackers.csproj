@@ -12,7 +12,7 @@ Provides an abstraction over issue trackers, giving a common API to get issue an
     <PackageIconUrl>https://raw.github.com/GitTools/GitTools.Core/develop/GitTools_logo.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/GitTools/GitTools.IssueTrackers</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageLicenseUrl>https://github.com/GitTools/GitTools.Core/blob/develop/LICENSE</PackageLicenseUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Copyright>Copyright GitTools Team 2015</Copyright>
     <PackageTags>git tools issue tracker</PackageTags>
     <Authors>GitTools Contributors</Authors>
