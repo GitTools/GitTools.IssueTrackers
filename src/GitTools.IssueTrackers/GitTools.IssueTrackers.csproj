@@ -18,6 +18,8 @@ Provides an abstraction over issue trackers, giving a common API to get issue an
     <Authors>GitTools Contributors</Authors>
     <Company>GitTools</Company>
     <Version>0.0.0</Version>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>..\..\output\Debug\GitTools.IssueTrackers\netstandard2.0\</OutputPath>
