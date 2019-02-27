@@ -14,7 +14,7 @@ assembly_info:
 
 dotnet_csproj:
   patch: true
-  file: 'src\GitTools\GitTools.IssueTrackers.csproj'
+  file: 'src\GitTools.IssueTrackers\GitTools.IssueTrackers.csproj'
   version: $(GitVersion_FullSemVer)
   package_version: $(GitVersion_FullSemVer)
   assembly_version: $(GitVersion_AssemblySemVer)
